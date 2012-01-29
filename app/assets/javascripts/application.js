@@ -6,4 +6,7 @@
 //
 //= require jquery
 //= require jquery_ujs
+//= require lib/underscore
+//= require lib/backbone
+//= require lib/backbone.localStorage
 //= require_tree .
