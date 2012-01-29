@@ -1,23 +1,25 @@
 Todo = Backbone.Model.extend
   defaults:
-    done: false
-  toggle: ->
-    this.save done: not this.get('done')
+    status: 'incomplete'
+  isComplete: ->
+    this.get('status') is 'complete'
+  toggleStatus: ->
+    status = if this.isComplete() then 'incomplete' else 'complete'
+    this.save {status}
+    this.collection.trigger 'status-changed'
 
 TodoList = Backbone.Collection.extend
   model: Todo
   localStorage: new Store('todos')
-  done: ->
-    this.filter (todo) -> todo.get 'done'
-  remaining: ->
-    this.without.apply this, this.done()
+  completed: ->
+    this.select (todo) -> todo.isComplete()
 
 # Views
 TodoView = Backbone.View.extend
   model: Todo
   tagName: 'li'
   events:
-    'change .check'           : 'toggleDone'
+    'change .check'           : 'toggleStatus'
     'dblclick .todo-text'     : 'edit'
     'click .todo-destroy'     : 'destroy'
     'keypress .todo-input'    : 'updateOnEnter'
@@ -27,19 +29,22 @@ TodoView = Backbone.View.extend
     _.bindAll this, 'render', 'close', 'remove'
     this.model.bind 'change', this.render
     this.model.bind 'destroy', this.remove
+    this.model.bind 'change:status', this.setStatus
   render: ->
     element = this.template this.model.toJSON()
     $(this.el).html element
     this.input = this.$('.todo-input')
     return this
-  toggleDone: ->
-    this.model.toggle()
   edit: ->
     $(this.el).addClass 'editing'
     this.input.focus()
   close: (e) ->
     this.model.save text: this.input.val()
     $(this.el).removeClass 'editing'
+  toggleStatus: ->
+    this.model.toggleStatus()
+  setStatus: ->
+    $(this.el).toggleClass 'done'
   updateOnEnter: (e) ->
     e.target.blur() if e.keyCode is 13
   remove: ->
@@ -72,14 +77,13 @@ AppView = Backbone.View.extend
     this.collection.create text: value
     this.input.val ''
   clearCompleted: ->
-    _.each this.collection.done(), (todo) -> todo.destroy()
+    _.each this.collection.completed(), (todo) -> todo.destroy()
     return false
   render: ->
-    stats =
-      total: this.collection.length
-      done: this.collection.done().length
-      remaining: this.collection.remaining().length
-    this.$('#todo-stats').html this.statsTemplate(stats)
+    total = this.collection.length
+    completed = this.collection.completed().length
+    incomplete = total - completed
+    this.$('#todo-stats').html(this.statsTemplate {total, completed, incomplete})
 
 jQuery ($) ->
   App = new AppView

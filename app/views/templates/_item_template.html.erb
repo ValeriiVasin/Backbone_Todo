@@ -1,7 +1,7 @@
 <script type="text/template" id="item-template">
-  <div class="todo <%%= done ? 'done' : '' %>">
+  <div class="todo <%%= status === 'complete' ? 'done' : '' %>">
     <div class="display" title="Double click to edit...">
-      <input class="check" type="checkbox" <%%= done ? "checked='checked'" : '' %> />
+      <input class="check" type="checkbox" <%%= status === 'complete' ? "checked='checked'" : '' %> />
       <div class="todo-text"><%%= text %></div>
       <span class="todo-destroy"></span>
     </div>

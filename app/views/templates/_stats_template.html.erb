@@ -1,14 +1,14 @@
 <script type="text/template" id='stats-template'>
 <%% if (total > 0) { %>
     <span class="todo-count">
-      <span class="number"><%%= remaining %></span>
-      <span class="word"><%%= remaining === 1 ? 'item' : 'items' %></span> left.
+      <span class="number"><%%= incomplete %></span>
+      <span class="word"><%%= incomplete === 1 ? 'item' : 'items' %></span> left.
     </span>
-  <%% if (done > 0) { %>
+  <%% if (completed > 0) { %>
     <span class="todo-clear">
       <a href="#">
-        Clear <span class="number-done"><%%= done %></span>
-        completed <span class="word-done"><%%= done === 1 ? 'item' : 'items' %></span>
+        Clear <span class="number-done"><%%= completed %></span>
+        completed <span class="word-done"><%%= completed === 1 ? 'item' : 'items' %></span>
       </a>
     </span>
   <%% } %>
