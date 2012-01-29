@@ -53,10 +53,12 @@ AppView = Backbone.View.extend
     'keypress #new-todo'  : 'createOnEnter'
     'click .todo-clear a' : 'clearCompleted'
   initialize: ->
+    this.statsTemplate = _.template $('#stats-template').html()
     _.bindAll this, 'addOne', 'addAll', 'render'
     this.input = this.$('#new-todo')
     this.collection.bind 'add', this.addOne
     this.collection.bind 'reset', this.addAll
+    this.collection.bind 'all', this.render
     this.collection.fetch()
   addOne: (todo) ->
     view = new TodoView model: todo
@@ -72,7 +74,13 @@ AppView = Backbone.View.extend
   clearCompleted: ->
     _.each this.collection.done(), (todo) -> todo.destroy()
     return false
-  
+  render: ->
+    stats =
+      total: this.collection.length
+      done: this.collection.done().length
+      remaining: this.collection.remaining().length
+    this.$('#todo-stats').html this.statsTemplate(stats)
+
 jQuery ($) ->
   App = new AppView
     el: $('#todoapp')
